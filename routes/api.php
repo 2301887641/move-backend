@@ -13,7 +13,7 @@ use Illuminate\Http\Request;
 |
 */
 
-
+//验证码
 Route::get('/captcha','Api\LoginController@getCaptcha');
 
 Route::middleware('auth:api')->get('/user', function (Request $request) {

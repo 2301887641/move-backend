@@ -12,6 +12,7 @@ class Controller extends BaseController
     use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
     public function __construct()
     {
-//        header("Access-Control-Allow-Origin: {$_SERVER['HTTP_ORIGIN']}");
+
+
     }
 }
