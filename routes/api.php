@@ -13,9 +13,19 @@ use Illuminate\Http\Request;
 |
 */
 
-//验证码
-Route::get('/captcha','Api\LoginController@getCaptcha');
 
-Route::middleware('auth:api')->get('/user', function (Request $request) {
-    return $request->user();
+//获取用户信息
+//Route::middleware('auth:api')->get('/user', function (Request $request) {
+//    return $request->user();
+//});
+//
+Route::group(['middleware' => ['auth:api']], function () {
+    //用户列表
+    Route::get('/user','Api\Controller\UserController@index');
+    //获取当前用户
+    Route::get('/user/getUser',function(Request $request){
+        return $request->user();
+    });
+
 });
+

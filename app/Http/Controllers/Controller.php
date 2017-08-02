@@ -15,4 +15,32 @@ class Controller extends BaseController
 
 
     }
+
+    /**
+     * 成功信息打印
+     * @param $msg
+     * @param $data
+     * @return array
+     */
+    protected function success($msg,$data)
+    {
+        return [
+            "status"=>200,
+            "msg"=>$msg,
+            "data"=>$data
+        ];
+    }
+
+    /**
+     * 错误信息打印
+     * @param $msg
+     * @return array
+     */
+    protected function failed($msg)
+    {
+        return [
+            "status"=>500,
+            "msg"=>$msg,
+        ];
+    }
 }
