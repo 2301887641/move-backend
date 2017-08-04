@@ -20,9 +20,16 @@ class UserController extends Controller
         if(!empty($name)){
             $where["name"]=$name;
         }
-        $oldData=User::paginate(10)->toArray();
-        $newData=["data"=>$oldData["data"]];
-        return $this->success("",$newData);
-        $data=User::where($where)->get(["id","name","created_at"]);
+        $data=User::where($where)->paginate(10);
+        return $this->success("",$data);
+    }
+
+    /**
+     * 根据id获取单条数据
+     * @param $id
+     * @return mixed
+     */
+    public function read($id) {
+        return User::find($id);
     }
 }
