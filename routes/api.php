@@ -20,13 +20,13 @@ use Illuminate\Http\Request;
 //});
 //
 Route::group(['middleware' => ['auth:api']], function () {
-    //用户列表
-    Route::get('/user','Api\Controller\UserController@index');
+    //用户相关-------------------
+    Route::resource('admin','Api\Controller\AdminController');
     //获取当前用户
-    Route::get('/user/getUser',function(Request $request){
+    Route::get('/admin/getUser',function(Request $request){
         return $request->user();
     });
-    Route::get('/user/getOne/{id}','Api\Controller\UserController@read');
-
+    //批量删除
+    Route::post('/admin/delAll','Api\Controller\AdminController@destroyAll');
 });
 

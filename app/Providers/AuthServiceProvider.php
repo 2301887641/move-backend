@@ -15,7 +15,8 @@ class AuthServiceProvider extends ServiceProvider
      * @var array
      */
     protected $policies = [
-        'App\Model' => 'App\Policies\ModelPolicy',
+//        'App\Model' => 'App\Policies\ModelPolicy',
+        \App\User::class => \App\Policies\UserPolicy::class,
     ];
 
     /**
@@ -30,5 +31,8 @@ class AuthServiceProvider extends ServiceProvider
         //token过期时间15天  刷新过期时间15天
         Passport::tokensExpireIn(Carbon::now()->addDays(1));
         Passport::refreshTokensExpireIn(Carbon::now()->addDays(1));
+//        Gate::define('view', function ($user) {
+//            return true;
+//        });
     }
 }

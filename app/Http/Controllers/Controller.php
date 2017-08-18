@@ -22,7 +22,7 @@ class Controller extends BaseController
      * @param $data
      * @return array
      */
-    protected function success($msg,$data)
+    protected function success($msg,$data='')
     {
         return [
             "status"=>200,

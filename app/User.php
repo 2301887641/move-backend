@@ -26,4 +26,15 @@ class User extends Authenticatable
     protected $hidden = [
         'password', 'remember_token','updated_at'
     ];
+
+    /**
+     * 可以用户名登录
+     * @param $username
+     * @return mixed
+     */
+    public function findForPassport($username)
+    {
+        return $this->orwhere(["name"=>$username,"status"=>1])->orwhere(["email"=>$username,"status"=>1])->first();
+    }
+
 }
