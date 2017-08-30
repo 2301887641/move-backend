@@ -8,3 +8,5 @@ laravel5.4版本的电影后台--搭配前台vue2.0实现
 2.gates和policy 用户授权 auth权限
 
 3.restfull 风格API 
+
+4.实现手机端验证码功能

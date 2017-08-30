@@ -19,8 +19,9 @@ class CreateAuthRulesTable extends Migration
             $table->string('name',100)->comment('对应的栏目名称');
             $table->string('role',100)->comment('栏目路由');
             $table->tinyInteger('type')->default(1)->comment('是否开启细规则验证 为1表示condition字段就可以定义规则表达式 如定义{score}>5 and {score}<100 表示用户的分数在5-100之间时这条规则才会通过');
-            $table->string('condition',100)->comment('condition字段里面的内容将会用作正则表达式的规则来配合认证规则来认证用户');
+            $table->string('condition',100)->default("")->comment('condition字段里面的内容将会用作正则表达式的规则来配合认证规则来认证用户');
             $table->tinyInteger('status')->default(1)->comment('状态：为1正常，为0禁用');
+            $table->integer('parent_id')->default(0)->comment('父类的id');
             $table->timestamps();
         });
     }

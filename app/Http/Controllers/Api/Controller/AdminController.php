@@ -23,11 +23,11 @@ class AdminController extends Controller
 //            return $this->failed("没有权限访问!!");
 //        }
 
-        $user = $request->user();
-        if($user->can('view')){
-            return 1;
-        }
-        return 2;
+//        $user = $request->user();
+//        if($user->can('view')){
+//            return 1;
+//        }
+//        return 2;
         $name=$request->get('name');
         $stime=$request->get('stime');
         $etime=$request->get('etime');
@@ -168,35 +168,6 @@ class AdminController extends Controller
         }
         if($id==$user["id"] || ($id == 1)){
             return $this->failed("不能删除当前用户!!");
-        }
-        if(User::destroy($id)){
-            return $this->success("删除用户成功");
-        }
-        return $this->failed("删除用户失败!!");
-    }
-
-    /**
-     * 批量删除
-     * @param Request $request
-     * @return array|string
-     */
-    public function destroyAll(Request $request)
-    {
-        $id=$request->input("id");
-        if(empty($id) || !is_array($id)){
-            return $this->failed("删除用户失败!!");
-        }
-        $user=$request->user();
-        if(empty($user['id'])){
-            return $this->failed("当前用户验证失败");
-        }
-        // 当前用户
-        if(in_array($user['id'],$id)){
-            return $this->failed("当前用户不能删除");
-        }
-        // 系统管理员
-        if(in_array(1,$id)){
-            return $this->failed("系统管理员不能删除");
         }
         if(User::destroy($id)){
             return $this->success("删除用户成功");

@@ -22,11 +22,11 @@ use Illuminate\Http\Request;
 Route::group(['middleware' => ['auth:api']], function () {
     //用户相关-------------------
     Route::resource('admin','Api\Controller\AdminController');
+    //用户权限相关
+    Route::resource('authRule','Api\Controller\AuthRuleController');
     //获取当前用户
     Route::get('/admin/getUser',function(Request $request){
         return $request->user();
     });
-    //批量删除
-    Route::post('/admin/delAll','Api\Controller\AdminController@destroyAll');
 });
 
