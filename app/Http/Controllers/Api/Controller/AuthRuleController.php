@@ -13,10 +13,9 @@ class AuthRuleController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(AuthRule $authRule)
     {
-        $authRule=new AuthRule();
-        $data=AuthRule::all();
+        $data=$authRule->select("id","name","rule","role","status","icon","parent_id","created_at","type")->get();
         if(empty($data)){
             $data=[];
             $total=0;
@@ -32,9 +31,11 @@ class AuthRuleController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function create(AuthRule $authRule)
     {
-        //
+        $data=$authRule->select("id","name","parent_id")->get();
+        $treeData=$authRule->get_tree($data);
+        return $this->success('',$treeData);
     }
 
     /**
@@ -85,7 +86,8 @@ class AuthRuleController extends Controller
      */
     public function edit($id)
     {
-        //
+        $data=AuthRule::find($id, ["id","rule","role","status","parent_id","name"]);
+        return $this->success('',$data);
     }
 
     /**
@@ -97,7 +99,26 @@ class AuthRuleController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $rule = [
+            "name" => "required|unique:auth_rules,name,".$id,
+            "rule" => "required",
+            "role" => "required"
+        ];
+        $message = [
+            "name.required" => "请填写权限名称",
+            "name.unique" => "权限名称不能重复",
+            "rule.required" => "请填写对应规则",
+            "role.required" => "请填写对应路由",
+        ];
+        $authRule=AuthRule::find($id);
+        $validator=Validator::make($request->input(),$rule,$message);
+        if($validator->fails()){
+            return $this->failed($validator->errors()->first());
+        }
+        if($authRule->save()){
+            return $this->success("修改成功");
+        }
+        return $this->failed("修改失败");
     }
 
     /**
@@ -109,5 +130,10 @@ class AuthRuleController extends Controller
     public function destroy($id)
     {
         //
+    }
+
+    public function getMenu()
+    {
+        return (new AuthRule())->getMenu();
     }
 }
