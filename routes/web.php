@@ -15,7 +15,7 @@ Route::get('/captcha','Api\Controller\LoginController@getCaptcha');
 //检查验证码
 Route::get('/checkCaptcha/{captcha}','Api\Controller\LoginController@checkCaptcha');
 //测试
-Route::get('/user','Api\Controller\UserController@add');
+Route::get('/menu','Api\Controller\AuthRuleController@getMenu');
 
 
 Auth::routes();

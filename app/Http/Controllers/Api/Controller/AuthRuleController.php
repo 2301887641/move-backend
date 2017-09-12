@@ -15,6 +15,7 @@ class AuthRuleController extends Controller
      */
     public function index(AuthRule $authRule)
     {
+        return $authRule->getMenu();
         $data=$authRule->select("id","name","rule","role","status","icon","parent_id","created_at","type")->get();
         if(empty($data)){
             $data=[];
@@ -49,19 +50,37 @@ class AuthRuleController extends Controller
         $rule = [
             "name" => "required|unique:auth_rules",
             "rule" => "required",
-            "role" => "required"
+            "role" => "required",
+            "parent_id"=>"required",
+            "icon"=>"required"
         ];
         $message = [
             "name.required" => "请填写权限名称",
             "name.unique" => "权限名称不能重复",
             "rule.required" => "请填写对应规则",
             "role.required" => "请填写对应路由",
+            "parent_id.required"=>"请选择上级权限",
+            "icon.required"=>"请选择图标"
         ];
-        $validator = Validator::make($request->input(), $rule, $message);
+        $data=$request->input();
+        $validator = Validator::make($data, $rule, $message);
         if ($validator->fails()) {
             return $this->failed($validator->first());
         }
-        if (!$authRule->fill($request->input())->save()) {
+        //如果不是模块
+        if($data["parent_id"]!==0){
+            $findData=AuthRule::where("id",$data["parent_id"])->first();
+            if(empty($findData)){
+                return $this->failed("数据获取失败");
+            }
+            //根据parent_id来分别赋值path
+            if($findData["parent_id"]==0){
+                $data["path"]=",".$findData["id"].",";
+            }else{
+                $data["path"]=$findData["path"].$findData["id"].",";
+            }
+        }
+        if (!$authRule->fill($data)->save()) {
             return $this->failed("添加失败");
         }
         return $this->success("添加成功");
