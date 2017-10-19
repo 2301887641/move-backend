@@ -31,7 +31,6 @@ class AdminController extends Controller
         $name=$request->get('name');
         $stime=$request->get('stime');
         $etime=$request->get('etime');
-        $where=[];
         $query=User::query();
         if(!empty($name)){
             $query->where("name",'=',$name);

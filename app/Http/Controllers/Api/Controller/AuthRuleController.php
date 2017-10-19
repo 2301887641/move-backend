@@ -15,7 +15,6 @@ class AuthRuleController extends Controller
      */
     public function index(AuthRule $authRule)
     {
-        return $authRule->getMenu();
         $data=$authRule->select("id","name","rule","role","status","icon","parent_id","created_at","type")->get();
         if(empty($data)){
             $data=[];
@@ -48,7 +47,7 @@ class AuthRuleController extends Controller
     public function store(Request $request,AuthRule $authRule)
     {
         $rule = [
-            "name" => "required|unique:auth_rules",
+            "name" => "required",
             "rule" => "required",
             "role" => "required",
             "parent_id"=>"required",
@@ -56,7 +55,6 @@ class AuthRuleController extends Controller
         ];
         $message = [
             "name.required" => "请填写权限名称",
-            "name.unique" => "权限名称不能重复",
             "rule.required" => "请填写对应规则",
             "role.required" => "请填写对应路由",
             "parent_id.required"=>"请选择上级权限",
@@ -79,6 +77,8 @@ class AuthRuleController extends Controller
             }else{
                 $data["path"]=$findData["path"].$findData["id"].",";
             }
+            $findData->class=1;
+            $findData->save();
         }
         if (!$authRule->fill($data)->save()) {
             return $this->failed("添加失败");
@@ -105,7 +105,7 @@ class AuthRuleController extends Controller
      */
     public function edit($id)
     {
-        $data=AuthRule::find($id, ["id","rule","role","status","parent_id","name"]);
+        $data=AuthRule::find($id, ["id","rule","role","status","parent_id","name","icon"]);
         return $this->success('',$data);
     }
 
@@ -151,8 +151,21 @@ class AuthRuleController extends Controller
         //
     }
 
+    /**
+     * 获取栏目
+     * @return array
+     */
     public function getMenu()
     {
         return (new AuthRule())->getMenu();
+    }
+
+    /**
+     * 获取权限树形结构
+     * @return array
+     */
+    public function getPermissions()
+    {
+        return (new AuthRule())->getPermissions();
     }
 }

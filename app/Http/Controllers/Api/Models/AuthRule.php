@@ -34,7 +34,18 @@ class AuthRule extends Model
      */
     public function getMenu()
     {
-        $data = self::select("id","icon","name as text","parent_id")->get();
+        $data = self::select("id","icon","name as text","parent_id","role","class")->get();
+        $data=$data->toArray();
+        return $this->list_to_tree($data, 'id', 'parent_id', 'children', 0);
+    }
+
+    /**
+     * 获取权限列表树形结构
+     * @return array
+     */
+    public function getPermissions()
+    {
+        $data = self::select("id","name","parent_id","class")->get();
         $data=$data->toArray();
         return $this->list_to_tree($data, 'id', 'parent_id', 'children', 0);
     }
@@ -55,6 +66,13 @@ class AuthRule extends Model
             //创建基于主键的数组引用
             $refer = array();
             foreach ($list as $key => $data) {
+                //后期可以去掉 如果没有class字段的话 主要用于前台的显示效果
+                if(empty($list[$key]["class"])){
+                    unset($list[$key]["class"]);
+                }else{
+                // 前端返回class为空才正常
+                    $list[$key]["class"]='';
+                }
                 $refer[$data[$pk]] = & $list[$key];
             }
             foreach ($list as $key => $data) {
