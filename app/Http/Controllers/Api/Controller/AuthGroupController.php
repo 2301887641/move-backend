@@ -69,15 +69,16 @@ class AuthGroupController extends Controller
         }
         // 先转换为数组
         $permission_arr=$request->input("permission_id");
-        return $this->getPermissionRule($permission_arr);
-
+        // 权限json
+        $permissions=$this->formatterPermissionRule($permission_arr);
         // 然后排序
         sort($permission_arr);
         // 最后的文本
         $finally_permission=implode(",",$permission_arr);
         if(AuthGroup::create([
             "name"=>$request->input("name"),
-            "permission_id"=>$finally_permission
+            "permission_id"=>$finally_permission,
+            "permissions"=>$permissions
         ])){
             return $this->success("添加角色成功");
         }
@@ -143,6 +144,8 @@ class AuthGroupController extends Controller
                 $arr[$v["rule"]]=1;
             }
         }
-        return $arr;
+        $arr2=[];
+        $arr2["permissions"]=$arr;
+        return $arr2;
     }
 }
