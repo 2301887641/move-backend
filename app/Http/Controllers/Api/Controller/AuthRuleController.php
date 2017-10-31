@@ -65,20 +65,9 @@ class AuthRuleController extends Controller
         if ($validator->fails()) {
             return $this->failed($validator->first());
         }
-        //如果不是模块
-        if($data["parent_id"]!==0){
-            $findData=AuthRule::where("id",$data["parent_id"])->first();
-            if(empty($findData)){
-                return $this->failed("数据获取失败");
-            }
-            //根据parent_id来分别赋值path
-            if($findData["parent_id"]==0){
-                $data["path"]=",".$findData["id"].",";
-            }else{
-                $data["path"]=$findData["path"].$findData["id"].",";
-            }
-            $findData->class=1;
-            $findData->save();
+        //如果是模块的话class需要配合前端设为1
+        if($data["parent_id"]==0){
+            $data["class"]=1;
         }
         if (!$authRule->fill($data)->save()) {
             return $this->failed("添加失败");
@@ -130,11 +119,12 @@ class AuthRuleController extends Controller
             "role.required" => "请填写对应路由",
         ];
         $authRule=AuthRule::find($id);
-        $validator=Validator::make($request->input(),$rule,$message);
+        $data=$request->input();
+        $validator=Validator::make($data,$rule,$message);
         if($validator->fails()){
             return $this->failed($validator->errors()->first());
         }
-        if($authRule->save()){
+        if($authRule->fill($data)->save()){
             return $this->success("修改成功");
         }
         return $this->failed("修改失败");

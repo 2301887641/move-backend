@@ -23,7 +23,6 @@ class CreateAuthRulesTable extends Migration
             $table->tinyInteger('status')->default(1)->comment('状态：为1正常，为0禁用');
             $table->integer('parent_id')->default(0)->comment('父类的id');
             $table->string('icon')->default("")->comment("图标");
-            $table->string('path')->default(",")->comment("父级路径 主要用来查询");
             $table->string('class')->default("")->comment("控制栏目下拉");
             $table->timestamps();
         });

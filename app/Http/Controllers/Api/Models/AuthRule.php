@@ -93,5 +93,4 @@ class AuthRule extends Model
         }
         return $tree;
     }
-
 }

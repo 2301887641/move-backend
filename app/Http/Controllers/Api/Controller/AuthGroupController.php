@@ -69,7 +69,7 @@ class AuthGroupController extends Controller
         }
         // 先转换为数组
         $permission_arr=$request->input("permission_id");
-        // 权限json
+        // 获取权限相关内容
         $permissions=$this->formatterPermissionRule($permission_arr);
         // 然后排序
         sort($permission_arr);
@@ -78,7 +78,8 @@ class AuthGroupController extends Controller
         if(AuthGroup::create([
             "name"=>$request->input("name"),
             "permission_id"=>$finally_permission,
-            "permissions"=>$permissions
+            "permissions"=>json_encode($permissions["rule"]),
+            "permissions_name"=>$permissions["name"]
         ])){
             return $this->success("添加角色成功");
         }
@@ -93,7 +94,7 @@ class AuthGroupController extends Controller
      */
     public function show($id)
     {
-        //
+        return $this->success("",AuthGroup::select(["id","name","permission_id"])->find($id));
     }
 
     /**
@@ -116,7 +117,38 @@ class AuthGroupController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $rule=[
+            "name"=>"required|unique:auth_groups,name,".$id,
+            "permission_id"=>"required"
+        ];
+        $message=[
+            "name.require"=>"请填写角色名称",
+            "name.unique"=>"角色名称重复",
+            "permission_id.require"=>"请选择权限"
+        ];
+        $data=$request->input();
+        $validator=Validator::make($data,$rule,$message);
+        if($validator->fails()){
+            return $this->failed($validator->errors()->first());
+        }
+        $authRule=AuthGroup::find($id);
+        $authRule->name=$data["name"];
+        //排序
+        sort($data["permission_id"]);
+        //转文本
+        $finally_permission=implode(",",$data["permission_id"]);
+        // 传入的权限和之前的权限对比
+        if($finally_permission!=$authRule->permission_id){
+            // 获取权限相关内容
+            $permissions=$this->formatterPermissionRule($data["permission_id"]);
+            $authRule->permission_id=$finally_permission;
+            $authRule->permissions=json_encode($permissions["rule"]);
+            $authRule->permissions_name=$permissions["name"];
+        }
+        if($authRule->save()){
+            return $this->success("修改成功");
+        }
+        return $this->failed("修改失败");
     }
 
     /**
@@ -127,7 +159,10 @@ class AuthGroupController extends Controller
      */
     public function destroy($id)
     {
-        //
+        if(AuthGroup::destroy($id)){
+            return $this->success("删除成功");
+        }
+        return $this->failed("删除失败");
     }
 
     /**
@@ -137,15 +172,24 @@ class AuthGroupController extends Controller
      */
     public function formatterPermissionRule($permission_arr)
     {
-        $data=AuthRule::where("parent_id",'>',0)->get(["id","rule"]);
-        $arr=[];
-        foreach($data as $k=>$v){
-            if(in_array($v["id"],$permission_arr)){
-                $arr[$v["rule"]]=1;
-            }
-        }
-        $arr2=[];
-        $arr2["permissions"]=$arr;
-        return $arr2;
+        //获取数据并转成数组
+        $data=AuthRule::whereIn("id",$permission_arr)->select(["rule","name"])->get()->toArray();
+        //获取name字段数组
+        $name_arr=array_column($data,"name");
+        //后去rule字段
+        $permission=array_column($data,"rule");
+        //组合成新的下标数组
+        $new_permission=array_fill_keys($permission,1);
+        return ["rule"=>$new_permission, "name"=>implode(",",$name_arr)];
+    }
+
+    /**
+     * 获取角色列表
+     * @return array
+     */
+    public function AuthGroupList()
+    {
+        $data=AuthGroup::select(["id","name"])->get();
+        return $this->success("",$data);
     }
 }
