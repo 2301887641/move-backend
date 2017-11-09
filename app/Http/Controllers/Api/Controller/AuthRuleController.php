@@ -63,7 +63,7 @@ class AuthRuleController extends Controller
         $data=$request->input();
         $validator = Validator::make($data, $rule, $message);
         if ($validator->fails()) {
-            return $this->failed($validator->first());
+            return $this->failed($validator->errors()->first());
         }
         //如果是模块的话class需要配合前端设为1
         if($data["parent_id"]==0){
