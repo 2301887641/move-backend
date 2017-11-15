@@ -36,5 +36,7 @@ Route::group(['middleware' => ['auth:api']], function () {
     Route::resource('/authGroup','Api\Controller\AuthGroupController');
     //获取角色列表
     Route::get('/authGroupList','Api\Controller\AuthGroupController@AuthGroupList');
+    //用户组认证
+    Route::resource('/userAuth','Api\Controller\AuthGroupAccessController');
 });
 
