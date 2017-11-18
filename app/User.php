@@ -34,7 +34,7 @@ class User extends Authenticatable
      */
     public function findForPassport($username)
     {
-        return $this->orwhere(["name"=>$username,"status"=>1])->orwhere(["email"=>$username,"status"=>1])->first();
+        return $this->orwhere(["name"=>$username])->orwhere(["email"=>$username])->first();
     }
 
 }
