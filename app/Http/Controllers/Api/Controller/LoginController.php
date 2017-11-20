@@ -11,7 +11,7 @@ class LoginController extends Controller
      */
     public function getCaptcha()
     {
-        return Captcha();
+        return Captcha('mini');
     }
 
     /**
