@@ -26,6 +26,8 @@ Route::group(['middleware' => ['auth:api']], function () {
     Route::get('/admin/getUser',function(Request $request){
         return $request->user();
     });
+    //获取用户列表
+    Route::get('/admin/userList','Api\Controller\AdminController\userList');
     //用户权限
     Route::resource('/authRule','Api\Controller\AuthRuleController');
     //用户菜单

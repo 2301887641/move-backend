@@ -173,4 +173,14 @@ class AdminController extends Controller
         }
         return $this->failed("删除用户失败!!");
     }
+
+    /**
+     * 获取用户列表
+     * @return array
+     */
+    public function userList()
+    {
+//        $data=User::get(["id","name as text"]);
+//        return $this->success("",$data);
+    }
 }
