@@ -187,7 +187,7 @@ class AuthGroupController extends Controller
      * 获取角色列表
      * @return array
      */
-    public function AuthGroupList()
+    public function authGroupList()
     {
         $data=AuthGroup::select(["id","name"])->get();
         return $this->success("",$data);

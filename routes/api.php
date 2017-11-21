@@ -12,33 +12,38 @@ use Illuminate\Http\Request;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
-
-
-//获取用户信息
-//Route::middleware('auth:api')->get('/user', function (Request $request) {
-//    return $request->user();
-//});
-//
-Route::group(['middleware' => ['auth:api']], function () {
-    //用户相关-------------------
-    Route::resource('/admin','Api\Controller\AdminController');
+//用户相关-------------------
+Route::group(['middleware'=>['auth:api'],"prefix"=>"admin"],function() {
+    //用户基本操作
+    Route::resource('base','Api\Controller\AdminController');
     //获取当前用户
-    Route::get('/admin/getUser',function(Request $request){
+    Route::get('getUser',function(Request $request){
         return $request->user();
     });
     //获取用户列表
-    Route::get('/admin/userList','Api\Controller\AdminController\userList');
-    //用户权限
-    Route::resource('/authRule','Api\Controller\AuthRuleController');
-    //用户菜单
-    Route::get('/menu','Api\Controller\AuthRuleController@getMenu');
-    //获取所有权限树
-    Route::get('/getPermissions','Api\Controller\AuthRuleController@getPermissions');
-    //用户角色
-    Route::resource('/authGroup','Api\Controller\AuthGroupController');
-    //获取角色列表
-    Route::get('/authGroupList','Api\Controller\AuthGroupController@AuthGroupList');
-    //用户组认证
-    Route::resource('/userAuth','Api\Controller\AuthGroupAccessController');
+    Route::get('userList','Api\Controller\AdminController@userList');
 });
 
+//用户权限
+Route::group(['middleware' => ['auth:api'],"prefix"=>"authRule"], function () {
+    //用户权限
+    Route::resource('base','Api\Controller\AuthRuleController');
+    //用户菜单
+    Route::get('menu','Api\Controller\AuthRuleController@getMenu');
+    //获取所有权限树
+    Route::get('getPermissions','Api\Controller\AuthRuleController@getPermissions');
+});
+
+//用户组
+Route::group(['middleware' => ['auth:api'],"prefix"=>"authGroup"], function () {
+    //用户组
+    Route::resource('authGroup','Api\Controller\AuthGroupController');
+    //获取用户组列表
+    Route::get('authGroupList','Api\Controller\AuthGroupController@authGroupList');
+});
+
+//用户组认证
+Route::group(['middleware' => ['auth:api'],"prefix"=>"authGroupAccess"], function () {
+    //用户组认证
+    Route::resource('userAuth','Api\Controller\AuthGroupAccessController');
+});

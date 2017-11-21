@@ -6,7 +6,7 @@ use App\User;
 use Validator;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Gate;
+//use Illuminate\Support\Facades\Gate;
 class AdminController extends Controller
 {
     /**
@@ -180,7 +180,7 @@ class AdminController extends Controller
      */
     public function userList()
     {
-//        $data=User::get(["id","name as text"]);
-//        return $this->success("",$data);
+        $data=User::all(["id","name as text"]);
+        return $this->success("",$data);
     }
 }
