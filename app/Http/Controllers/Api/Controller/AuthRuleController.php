@@ -138,7 +138,10 @@ class AuthRuleController extends Controller
      */
     public function destroy($id)
     {
-        //
+        if((new AuthRule())->where(["id"=>$id])->delete()){
+            return $this->success("删除成功");
+        }
+        return $this->failed("删除失败");
     }
 
     /**

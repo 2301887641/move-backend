@@ -41,7 +41,7 @@ class AuthGroupAccessController extends Controller
      */
     public function create()
     {
-        //
+
     }
 
     /**

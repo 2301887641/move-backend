@@ -43,7 +43,8 @@ class AuthGroupController extends Controller
      */
     public function create()
     {
-        //
+        $data=AuthGroup::all(["id","name as text"]);
+        return $this->success("",$data);
     }
 
     /**
