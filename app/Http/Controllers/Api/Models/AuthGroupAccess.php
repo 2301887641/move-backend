@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\Models;
 
 use App\User;
+
 use Illuminate\Database\Eloquent\Model;
 
 class AuthGroupAccess extends Model
@@ -32,5 +33,4 @@ class AuthGroupAccess extends Model
         $group=AuthGroup::find($gid);
         return $group->name;
     }
-
 }

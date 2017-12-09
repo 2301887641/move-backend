@@ -112,8 +112,7 @@ class AuthGroupAccessController extends Controller
             "group_id.required"=>"请选择角色"
         ];
         $data=$request->input();
-
-
+        ];
 
     }
 
