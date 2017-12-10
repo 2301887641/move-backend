@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\Controller;
 
 use App\Http\Controllers\Api\Models\AuthGroupAccess;
+use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
@@ -65,8 +66,14 @@ class AuthGroupAccessController extends Controller
         if($validator->fails()){
             return $this->failed($validator->errors()->first());
         }
-        if($authGroupAccess->fill($data)->save()){
+        try{
+            $authGroupAccess->fill($data)->save();
             return $this->success("添加成功");
+        }catch(QueryException $e){
+            // 1062说明是重复的字段 因为用户名和角色是不允许重复的
+             if($e->errorInfo[1]==1062){
+                 return $this->failed("不可以添加重复的用户名和角色");
+             }
         }
         return $this->failed("添加失败");
     }
@@ -112,7 +119,7 @@ class AuthGroupAccessController extends Controller
             "group_id.required"=>"请选择角色"
         ];
         $data=$request->input();
-        ];
+
 
     }
 
