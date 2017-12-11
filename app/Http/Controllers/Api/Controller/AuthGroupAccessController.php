@@ -74,8 +74,9 @@ class AuthGroupAccessController extends Controller
              if($e->errorInfo[1]==1062){
                  return $this->failed("不可以添加重复的用户名和角色");
              }
+            return $this->failed("添加失败");
         }
-        return $this->failed("添加失败");
+
     }
 
     /**

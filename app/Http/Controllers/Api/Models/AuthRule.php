@@ -32,11 +32,38 @@ class AuthRule extends Model
      * 获取前台要展示的栏目
      * @return array
      */
-    public function getMenu()
+    public function getMenu($user)
     {
-        $data = self::select("id","icon","name as text","parent_id","role","class")->get();
-        $data=$data->toArray();
-        return $this->list_to_tree($data, 'id', 'parent_id', 'children', 0);
+        $authGroupAccessIds=AuthGroupAccess::where(["uid"=>$user->id])->get(["group_id"]);
+        if($authGroupAccessIds->isEmpty()){
+            return [];
+        }
+        //遍历用户组id 获取rule id
+        foreach($this->formatAuthGroupAIds($authGroupAccessIds) as $item){
+           return ($item);
+        }
+
+//        $data = self::select("id","icon","name as text","parent_id","role","class")->get();
+//        $data=$data->toArray();
+//        return $this->list_to_tree($data, 'id', 'parent_id', 'children', 0);
+    }
+
+
+    private function formatAuthGroupAIds($authGroupAccessIds)
+    {
+       foreach($authGroupAccessIds as $item){
+           yield $this->getAuthGroupById($item->group_id);
+       }
+    }
+
+    /**
+     * 根据id获取auth_group
+     * @param $id
+     * @return \Illuminate\Database\Eloquent\Collection|Model|null|static|static[]
+     */
+    public function getAuthGroupById($id)
+    {
+        return AuthGroup::select(["permission_id"])->find($id);
     }
 
     /**

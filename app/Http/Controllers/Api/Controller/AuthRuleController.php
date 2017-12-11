@@ -148,9 +148,9 @@ class AuthRuleController extends Controller
      * 获取栏目
      * @return array
      */
-    public function getMenu()
+    public function getMenu(Request $request)
     {
-        return (new AuthRule())->getMenu();
+        return (new AuthRule())->getMenu($request->user());
     }
 
     /**
