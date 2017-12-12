@@ -22,4 +22,14 @@ class AuthGroup extends Model
         }
         return $msg;
     }
+
+    /**
+     * 根据id获取auth_group
+     * @param $id
+     * @return \Illuminate\Database\Eloquent\Collection|Model|null|static|static[]
+     */
+    public static function getPermissionIdById($id)
+    {
+        return self::select(["permission_id"])->find($id);
+    }
 }

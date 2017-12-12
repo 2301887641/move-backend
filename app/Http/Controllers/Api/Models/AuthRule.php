@@ -38,32 +38,40 @@ class AuthRule extends Model
         if($authGroupAccessIds->isEmpty()){
             return [];
         }
+        //存放规则id数组
+        $ruleIdArr=[];
         //遍历用户组id 获取rule id
         foreach($this->formatAuthGroupAIds($authGroupAccessIds) as $item){
-           return ($item);
+            if(isset($item->permission_id)){
+                $ruleIdArr[]=$item->permission_id;
+            }
         }
-
-//        $data = self::select("id","icon","name as text","parent_id","role","class")->get();
-//        $data=$data->toArray();
-//        return $this->list_to_tree($data, 'id', 'parent_id', 'children', 0);
-    }
-
-
-    private function formatAuthGroupAIds($authGroupAccessIds)
-    {
-       foreach($authGroupAccessIds as $item){
-           yield $this->getAuthGroupById($item->group_id);
-       }
+        //获取选定id的规则
+        $ruleIdStr=implode(",",$ruleIdArr);
+        $ruleIdArr=explode(",",$ruleIdStr);
+        $data=self::select("id","icon","name as text","parent_id","role","class")->whereIn("id",$ruleIdArr)->get();
+        $data=$data->toArray();
+        //获取选定id的父类的id规则 去除重复的
+        $parent_ids=array_unique(array_column($data,"parent_id"));
+        //父类id有可能在选定id中存在 所以要取个差集
+        $parent_ids=array_diff($parent_ids,array_column($data,"id"));
+        $parentData=self::select("id","icon","name as text","parent_id","role","class")->whereIn("id",$parent_ids)->get();
+        $parentData=$parentData->toArray();
+        //合并数据
+        $data=array_merge($data,$parentData);
+        return $this->list_to_tree($data, 'id', 'parent_id', 'children', 0);
     }
 
     /**
-     * 根据id获取auth_group
-     * @param $id
-     * @return \Illuminate\Database\Eloquent\Collection|Model|null|static|static[]
+     * 获取authGroup id
+     * @param $authGroupAccessIds
+     * @return \Generator
      */
-    public function getAuthGroupById($id)
+    private function formatAuthGroupAIds($authGroupAccessIds)
     {
-        return AuthGroup::select(["permission_id"])->find($id);
+       foreach($authGroupAccessIds as $item){
+           yield AuthGroup::getPermissionIdById($item->group_id);
+       }
     }
 
     /**
