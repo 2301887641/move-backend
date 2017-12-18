@@ -34,7 +34,27 @@ class AuthRule extends Model
      */
     public function getMenu($user)
     {
-        $authGroupAccessIds=AuthGroupAccess::where(["uid"=>$user->id])->get(["group_id"]);
+        //获取管理员的id
+        $adminId=config("core.admin.id");
+        if($user->id!=$adminId){
+            $data=$this->getAuthRulesById($user->id);
+        }else{
+            //直接获取所有
+            $data=self::select("id","icon","name as text","parent_id","role","class")->get();
+            $data=$data->toArray();
+        }
+        return $this->list_to_tree($data, 'id', 'parent_id', 'children', 0);
+    }
+
+    /**
+     * 根据id获取对应的authrules
+     * @param $id
+     * @return array|\Illuminate\Database\Eloquent\Collection|static[]
+     */
+    public function getAuthRulesById($id)
+    {
+        //获取指定id的group_id
+        $authGroupAccessIds=AuthGroupAccess::where(["uid"=>$id])->get(["group_id"]);
         if($authGroupAccessIds->isEmpty()){
             return [];
         }
@@ -59,7 +79,7 @@ class AuthRule extends Model
         $parentData=$parentData->toArray();
         //合并数据
         $data=array_merge($data,$parentData);
-        return $this->list_to_tree($data, 'id', 'parent_id', 'children', 0);
+        return $data;
     }
 
     /**

@@ -13,8 +13,9 @@ class AuthRuleController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(AuthRule $authRule)
+    public function index(Request $request,AuthRule $authRule)
     {
+        $this->authorize('view',$authRule);
         $data=$authRule->select("id","name","rule","role","status","icon","parent_id","created_at","type")->get();
         if(empty($data)){
             $data=[];

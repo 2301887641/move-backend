@@ -161,11 +161,12 @@ class AdminController extends Controller
      */
     public function destroy(Request $request,$id)
     {
+        $adminId=config("core.admin.id");
         $user=$request->user();
         if(empty($user['id'])){
             return $this->failed("当前用户验证失败");
         }
-        if($id==$user["id"] || ($id == 1)){
+        if($id==$user["id"] || ($id == $adminId)){
             return $this->failed("不能删除当前用户!!");
         }
         if(User::destroy($id)){
@@ -180,7 +181,8 @@ class AdminController extends Controller
      */
     public function userList()
     {
-        $data=User::all(["id","name as text"]);
+        $adminId=config("core.admin.id");
+        $data=User::where("id","<>",$adminId)->get(["id","name as text"]);
         return $this->success("",$data);
     }
 }
