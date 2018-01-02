@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Api\Controller;
+namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Api\Models\AuthGroup;
 use App\Http\Controllers\Api\Models\AuthRule;

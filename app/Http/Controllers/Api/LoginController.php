@@ -1,17 +1,27 @@
 <?php
 
-namespace App\Http\Controllers\Api\Controller;
+namespace App\Http\Controllers\Api;
+
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\Services\LoginService;
 use Illuminate\Http\Request;
+
 class LoginController extends Controller
 {
+    private $loginService;
+
+    public function __construct(LoginService $loginService)
+    {
+        $this->loginService = $loginService;
+    }
+
     /**
      * 生成验证码
      * @return mixed
      */
     public function getCaptcha()
     {
-        return Captcha('mini');
+        return $this->loginService->getCaptcha('mini');
     }
 
     /**
@@ -21,9 +31,6 @@ class LoginController extends Controller
      */
     public function checkCaptcha($captcha)
     {
-        if(captcha_check($captcha)){
-            return ["status"=>"success"];
-        }
-        return ["status"=>"failed"];
+        return $this->loginService->checkCaptcha($captcha);
     }
 }

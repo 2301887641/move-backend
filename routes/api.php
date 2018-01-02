@@ -15,35 +15,35 @@ use Illuminate\Http\Request;
 //用户相关-------------------
 Route::group(['middleware'=>['auth:api'],"prefix"=>"admin"],function() {
     //基本操作
-    Route::resource('base','Api\Controller\AdminController');
+    Route::resource('base','Api\AdminController');
     //获取当前用户
     Route::get('getUser',function(Request $request){
         return $request->user();
     });
     //获取用户列表
-    Route::get('userList','Api\Controller\AdminController@userList');
+    Route::get('userList','Api\AdminController@userList');
 });
 
 //用户权限
 Route::group(['middleware' => ['auth:api'],"prefix"=>"authRule"], function () {
     //基本操作
-    Route::resource('base','Api\Controller\AuthRuleController');
+    Route::resource('base','Api\AuthRuleController');
     //用户菜单
-    Route::get('menu','Api\Controller\AuthRuleController@getMenu');
+    Route::get('menu','Api\AuthRuleController@getMenu');
     //获取所有权限树
-    Route::get('getPermissions','Api\Controller\AuthRuleController@getPermissions');
+    Route::get('getPermissions','Api\AuthRuleController@getPermissions');
 });
 
 //用户组
 Route::group(['middleware' => ['auth:api'],"prefix"=>"authGroup"], function () {
     //基本操作
-    Route::resource('base','Api\Controller\AuthGroupController');
+    Route::resource('base','Api\AuthGroupController');
     //获取用户组列表
-    Route::get('authGroupList','Api\Controller\AuthGroupController@authGroupList');
+    Route::get('authGroupList','Api\AuthGroupController@authGroupList');
 });
 
 //用户组认证
 Route::group(['middleware' => ['auth:api'],"prefix"=>"authGroupAccess"], function () {
     //基本操作
-    Route::resource('base','Api\Controller\AuthGroupAccessController');
+    Route::resource('base','Api\AuthGroupAccessController');
 });

@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
 use Laravel\Passport\Passport;
 use Illuminate\Support\Facades\Gate;
@@ -15,9 +16,7 @@ class AuthServiceProvider extends ServiceProvider
      * @var array
      */
     protected $policies = [
-//        'App\Model' => 'App\Policies\ModelPolicy',
         \App\User::class => \App\Policies\UserPolicy::class,
-        \APP\Http\Controllers\Api\Models\AuthRule::class=>\App\Policies\AuthRulePolicy::class,
     ];
 
     /**
@@ -32,8 +31,9 @@ class AuthServiceProvider extends ServiceProvider
         //token过期时间15天  刷新过期时间15天
         Passport::tokensExpireIn(Carbon::now()->addDays(1));
         Passport::refreshTokensExpireIn(Carbon::now()->addDays(1));
-//        Gate::define('view', function ($user) {
-//            return true;
-//        });
+        //注册权限
+        Gate::define('view', function ($user) {
+            return true;
+        });
     }
 }
