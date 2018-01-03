@@ -2,37 +2,31 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Controllers\Api\Models\AuthGroup;
-use App\Http\Controllers\Api\Models\AuthRule;
+use App\Http\Controllers\Api\AuthGroup;
+use App\Http\Controllers\Api\AuthRule;
+use App\Http\Controllers\Services\AuthGroupService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Validator;
 use App\Http\Controllers\Controller;
 
 class AuthGroupController extends Controller
 {
+    private $authGroupService;
+    private $request;
+    public function __construct(Request $request,AuthGroupService $authGroupService)
+    {
+        $this->authGroupService=$authGroupService;
+        $this->request=$request;
+    }
+
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request)
+    public function index()
     {
-        $name=$request->get('name');
-        $stime=$request->get('stime');
-        $etime=$request->get('etime');
-        $query=AuthGroup::query();
-        if(!empty($name)){
-            $query->where("name",'=',$name);
-        }
-        if(!empty($stime) && !empty($etime)){
-            $query->whereBetween("created_at",[$stime,$etime]);
-        }else if(!empty($stime)){
-            $query->where('created_at','>=',$stime);
-        }else if(!empty($etime)){
-            $query->where('created_at','<=',$etime);
-        }
-        $data=$query->orderBy("id","desc")->paginate(10);
+        $data=$this->authGroupService->index($this->request);
         return $this->success("",$data);
     }
 
@@ -43,7 +37,7 @@ class AuthGroupController extends Controller
      */
     public function create()
     {
-        $data=AuthGroup::all(["id","name as text"]);
+        $data=$this->authGroupService->getAll(["id","name as text"]);
         return $this->success("",$data);
     }
 

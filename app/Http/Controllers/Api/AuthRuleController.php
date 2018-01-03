@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\AuthRule;
 use App\Http\Controllers\Services\AuthRuleService;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -25,17 +24,10 @@ class AuthRuleController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request, AuthRule $authRule)
+    public function index()
     {
-        $data = $authRule->select("id", "name", "rule", "role", "status", "icon", "parent_id", "created_at", "type")->get();
-        if (empty($data)) {
-            $data = [];
-            $total = 0;
-        } else {
-            $data = $authRule->get_tree($data);
-            $total = count($data);
-        }
-        return $this->success('', ["data" => $data, "total" => $total]);
+        $data=$this->authRuleService->index(["id", "name", "rule", "role", "status", "icon", "parent_id", "created_at", "type"]);
+        return $this->success('', ["data" => $data["data"], "total" => $data["total"]]);
     }
 
     /**
@@ -43,11 +35,10 @@ class AuthRuleController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create(AuthRule $authRule)
+    public function create()
     {
-        $data = $authRule->select("id", "name", "parent_id")->get();
-        $treeData = $authRule->get_tree($data);
-        return $this->success('', $treeData);
+        $data = $this->authRuleService->get_tree(["id", "name", "parent_id"]);
+        return $this->success('', $data);
     }
 
     /**
@@ -56,7 +47,7 @@ class AuthRuleController extends Controller
      * @param  \Illuminate\Http\Request $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request, AuthRule $authRule)
+    public function store()
     {
         $rule = [
             "name" => "required",
@@ -72,7 +63,7 @@ class AuthRuleController extends Controller
             "parent_id.required" => "请选择上级权限",
             "icon.required" => "请选择图标"
         ];
-        $data = $request->input();
+        $data = $this->request->input();
         $validator = Validator::make($data, $rule, $message);
         if ($validator->fails()) {
             return $this->failed($validator->errors()->first());
@@ -81,7 +72,7 @@ class AuthRuleController extends Controller
         if ($data["parent_id"] == 0) {
             $data["class"] = 1;
         }
-        if (!$authRule->fill($data)->save()) {
+        if (!$this->authRuleService->store($data)) {
             return $this->failed("添加失败");
         }
         return $this->success("添加成功");
