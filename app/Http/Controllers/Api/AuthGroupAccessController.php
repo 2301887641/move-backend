@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Api\Models\AuthGroupAccess;
+use App\Http\Controllers\Services\AuthGroupService;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -10,29 +11,22 @@ use Illuminate\Support\Facades\Validator;
 
 class AuthGroupAccessController extends Controller
 {
+    private $authGroupService;
+    private $request;
+    public function __construct(Request $request,AuthGroupService $authGroupService)
+    {
+        $this->authGroupService=$authGroupService;
+        $this->request=$request;
+    }
+
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request)
+    public function index()
     {
-        $name=$request->get('name');
-        $stime=$request->get('stime');
-        $etime=$request->get('etime');
-        $query=AuthGroupAccess::query();
-        if(!empty($name)){
-            $query->where("name",'=',$name);
-        }
-        if(!empty($stime) && !empty($etime)){
-            $query->whereBetween("created_at",[$stime,$etime]);
-        }else if(!empty($stime)){
-            $query->where('created_at','>=',$stime);
-        }else if(!empty($etime)){
-            $query->where('created_at','<=',$etime);
-        }
-        $data=$query->select(["id","uid","group_id","created_at","uid as uname","group_id as gname"])->orderBy('created_at',"desc")->paginate(10);
-        return $this->success("",$data);
+        return $this->success("",$this->authGroupService->index($this->request,$this->pageInfo()));
     }
 
     /**

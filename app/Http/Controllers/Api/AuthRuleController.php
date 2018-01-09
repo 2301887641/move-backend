@@ -7,6 +7,11 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Validator;
 
+/**
+ * 权限
+ * Class AuthRuleController
+ * @package App\Http\Controllers\Api
+ */
 class AuthRuleController extends Controller
 {
     private $authRuleService;

@@ -2,8 +2,6 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Controllers\Api\AuthGroup;
-use App\Http\Controllers\Api\AuthRule;
 use App\Http\Controllers\Services\AuthGroupService;
 use Illuminate\Http\Request;
 use Validator;
@@ -26,7 +24,7 @@ class AuthGroupController extends Controller
      */
     public function index()
     {
-        $data=$this->authGroupService->index($this->request);
+        $data=$this->authGroupService->index($this->request,$this->pageInfo());
         return $this->success("",$data);
     }
 
@@ -47,7 +45,7 @@ class AuthGroupController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store()
     {
         $rule=[
             "name"=>"required|unique:auth_groups",
@@ -58,24 +56,12 @@ class AuthGroupController extends Controller
             "name.unique"=>"角色名重复",
             "permission_id.required"=>"请选择规则"
         ];
-        $validator=Validator::make($request->input(),$rule,$message);
+        $data=$this->request->input();
+        $validator=Validator::make($data,$rule,$message);
         if($validator->fails()){
             return $this->failed($validator->errors()->first());
         }
-        // 先转换为数组
-        $permission_arr=$request->input("permission_id");
-        // 获取权限相关内容
-        $permissions=$this->formatterPermissionRule($permission_arr);
-        // 然后排序
-        sort($permission_arr);
-        // 最后的文本
-        $finally_permission=implode(",",$permission_arr);
-        if(AuthGroup::create([
-            "name"=>$request->input("name"),
-            "permission_id"=>$finally_permission,
-            "permissions"=>json_encode($permissions["rule"]),
-            "permissions_name"=>$permissions["name"]
-        ])){
+        if($this->authGroupService->store($data)){
             return $this->success("添加角色成功");
         }
         return $this->failed("添加角色失败");
@@ -89,7 +75,7 @@ class AuthGroupController extends Controller
      */
     public function show($id)
     {
-        return $this->success("",AuthGroup::select(["id","name","permission_id"])->find($id));
+        return $this->authGroupService->findById($id,["id","name","permission_id"]);
     }
 
     /**
@@ -110,7 +96,7 @@ class AuthGroupController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update($id)
     {
         $rule=[
             "name"=>"required|unique:auth_groups,name,".$id,
@@ -121,26 +107,12 @@ class AuthGroupController extends Controller
             "name.unique"=>"角色名称重复",
             "permission_id.require"=>"请选择权限"
         ];
-        $data=$request->input();
+        $data=$this->request->input();
         $validator=Validator::make($data,$rule,$message);
         if($validator->fails()){
             return $this->failed($validator->errors()->first());
         }
-        $authRule=AuthGroup::find($id);
-        $authRule->name=$data["name"];
-        //排序
-        sort($data["permission_id"]);
-        //转文本
-        $finally_permission=implode(",",$data["permission_id"]);
-        // 传入的权限和之前的权限对比
-        if($finally_permission!=$authRule->permission_id){
-            // 获取权限相关内容
-            $permissions=$this->formatterPermissionRule($data["permission_id"]);
-            $authRule->permission_id=$finally_permission;
-            $authRule->permissions=json_encode($permissions["rule"]);
-            $authRule->permissions_name=$permissions["name"];
-        }
-        if($authRule->save()){
+        if($this->authGroupService->update($id,$data)){
             return $this->success("修改成功");
         }
         return $this->failed("修改失败");
@@ -154,29 +126,12 @@ class AuthGroupController extends Controller
      */
     public function destroy($id)
     {
-        if(AuthGroup::destroy($id)){
+        if($this->authGroupService->destory($id)){
             return $this->success("删除成功");
         }
         return $this->failed("删除失败");
     }
 
-    /**
-     * 格式化权限json
-     * @param $permission_arr
-     * @return array
-     */
-    public function formatterPermissionRule($permission_arr)
-    {
-        //获取数据并转成数组
-        $data=AuthRule::whereIn("id",$permission_arr)->select(["rule","name"])->get()->toArray();
-        //获取name字段数组
-        $name_arr=array_column($data,"name");
-        //后去rule字段
-        $permission=array_column($data,"rule");
-        //组合成新的下标数组
-        $new_permission=array_fill_keys($permission,1);
-        return ["rule"=>$new_permission, "name"=>implode(",",$name_arr)];
-    }
 
     /**
      * 获取角色列表
@@ -184,7 +139,7 @@ class AuthGroupController extends Controller
      */
     public function authGroupList()
     {
-        $data=AuthGroup::select(["id","name"])->get();
+        $data=$this->authGroupService->BaseGetAll(["id","name"]);
         return $this->success("",$data);
     }
 }

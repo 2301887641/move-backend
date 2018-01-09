@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Api\Models\AuthRule;
 use Illuminate\Foundation\Bus\DispatchesJobs;
+use Illuminate\Http\Request;
 use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
@@ -42,5 +43,21 @@ class Controller extends BaseController
             "status"=>500,
             "msg"=>$msg,
         ];
+    }
+
+    /**
+     * 获取分页信息
+     * @param Request $request
+     * @return array
+     */
+    protected function pageInfo()
+    {
+        $request=request()->instance();
+        $page=$request->get("page")?:1;
+        $pageSize=$request->get("pageSize")?:10;
+        return collect([
+            "page"=>($page-1)*$pageSize,
+             "pageSize"=>$pageSize
+        ]);
     }
 }
